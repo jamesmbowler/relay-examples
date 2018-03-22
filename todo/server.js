@@ -17,11 +17,25 @@ import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 import {schema} from './data/schema';
 
+var cors = require('cors');
+
 const APP_PORT = 3000;
 const GRAPHQL_PORT = 8080;
 
 // Expose a GraphQL endpoint
 const graphQLServer = express();
+
+graphQLServer.use("/", function (req, res, next) {
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Headers', 'content-type, authorization, content-length, x-requested-with, accept, origin');
+  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+  res.header('Access-Control-Allow-Origin', '*');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
 graphQLServer.use('/', graphQLHTTP({schema, pretty: true}));
 graphQLServer.listen(GRAPHQL_PORT, () => console.log(
   `GraphQL Server is now running on http://localhost:${GRAPHQL_PORT}`

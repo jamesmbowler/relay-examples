@@ -15,6 +15,7 @@ import Todo from './Todo';
 
 import React from 'react';
 import {
+  createPaginationContainer,
   createFragmentContainer,
   graphql,
 } from 'react-relay';
@@ -30,13 +31,30 @@ class TodoList extends React.Component {
     );
   };
   renderTodos() {
+    console.log('todos', this.props.viewer.todos);
+    console.log('number of edges',this.props.viewer.todos.edges.length);
+
     return this.props.viewer.todos.edges.map(edge =>
       <Todo
-        key={edge.node.id}
+        key={edge.node.__id}
         todo={edge.node}
         viewer={this.props.viewer}
       />
     );
+  }
+
+  _loadMore() {
+//console.log(this.props.relay.edgeCount());
+
+    if (!this.props.relay.hasMore()) {
+      console.log(`Nothing more to load`)
+      return
+    } else if (this.props.relay.isLoading()) {
+      console.log(`Request is already pending`)
+      return
+    }
+
+    this.props.relay.loadMore(10)
   }
   render() {
     const numTodos = this.props.viewer.totalCount;
@@ -55,29 +73,69 @@ class TodoList extends React.Component {
         <ul className="todo-list">
           {this.renderTodos()}
         </ul>
+        <div>
+          {this.props.relay.hasMore() &&
+          <div onClick={() => this._loadMore()}>More</div>
+          }
+        </div>
       </section>
     );
   }
 }
 
-export default createFragmentContainer(TodoList, {
+export default createPaginationContainer(TodoList, {
   viewer: graphql`
     fragment TodoList_viewer on User {
       todos(
-        first: 2147483647  # max GraphQLInt
+        first: $count,  # max GraphQLInt
+        after: $after
       ) @connection(key: "TodoList_todos") {
         edges {
           node {
-            id,
-            complete,
             ...Todo_todo,
-          },
-        },
+          }
+          cursor
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
       },
       id,
       totalCount,
       completedCount,
       ...Todo_viewer,
+
     }
   `,
-});
+},
+  {
+    direction: 'forward',
+    query: graphql`
+      query TodoListForwardQuery(
+        $count: Int!,
+        $after: String,
+      ) {
+        viewer {
+          ...TodoList_viewer
+        }
+      }
+    `,
+    getConnectionFromProps(props) {
+      return props.viewer && props.viewer.todos
+    },
+    getFragmentVariables(previousVariables, totalCount) {
+      return {
+        ...previousVariables,
+        count: totalCount,
+      }
+    },
+    getVariables(props, paginationInfo, fragmentVariables) {
+      return {
+        count: paginationInfo.count,
+        after: paginationInfo.cursor,
+      }
+    },
+  }
+
+);

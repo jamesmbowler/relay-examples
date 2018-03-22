@@ -31,6 +31,7 @@ class TodoApp extends React.Component {
   };
   render() {
     const hasTodos = this.props.viewer.totalCount > 0;
+    console.log('viewer', this.props.viewer);
     return (
       <div>
         <section className="todoapp">

@@ -38,8 +38,10 @@ import {
   User,
   addTodo,
   changeTodoStatus,
+  changeTodoImportant,
   getTodo,
   getTodos,
+  getImportantTodos,
   getUser,
   getViewer,
   markAllTodos,
@@ -79,6 +81,10 @@ const GraphQLTodo = new GraphQLObjectType({
     complete: {
       type: GraphQLBoolean,
       resolve: (obj) => obj.complete,
+    },
+    important: {
+      type: GraphQLBoolean,
+      resolve: (obj) => obj.important,
     },
   },
   interfaces: [nodeInterface],
@@ -181,6 +187,29 @@ const GraphQLChangeTodoStatusMutation = mutationWithClientMutationId({
   },
 });
 
+const GraphQLChangeTodoImportantMutation = mutationWithClientMutationId({
+  name: 'ChangeTodoImportant',
+  inputFields: {
+    important: { type: new GraphQLNonNull(GraphQLBoolean) },
+    id: { type: new GraphQLNonNull(GraphQLID) },
+  },
+  outputFields: {
+    todo: {
+      type: GraphQLTodo,
+      resolve: ({localTodoId}) => getTodo(localTodoId),
+    },
+    viewer: {
+      type: GraphQLUser,
+      resolve: () => getViewer(),
+    },
+  },
+  mutateAndGetPayload: ({id, important}) => {
+    const localTodoId = fromGlobalId(id).id;
+    changeTodoImportant(localTodoId, important);
+    return {localTodoId};
+  },
+});
+
 const GraphQLMarkAllTodosMutation = mutationWithClientMutationId({
   name: 'MarkAllTodos',
   inputFields: {
@@ -268,6 +297,7 @@ const Mutation = new GraphQLObjectType({
   fields: {
     addTodo: GraphQLAddTodoMutation,
     changeTodoStatus: GraphQLChangeTodoStatusMutation,
+    changeTodoImportant: GraphQLChangeTodoImportantMutation,
     markAllTodos: GraphQLMarkAllTodosMutation,
     removeCompletedTodos: GraphQLRemoveCompletedTodosMutation,
     removeTodo: GraphQLRemoveTodoMutation,

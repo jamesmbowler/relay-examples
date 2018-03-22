@@ -11,6 +11,7 @@
  */
 
 import ChangeTodoStatusMutation from '../mutations/ChangeTodoStatusMutation';
+import ChangeTodoImportantMutation from '../mutations/ChangeTodoImportantMutation';
 import RemoveTodoMutation from '../mutations/RemoveTodoMutation';
 import RenameTodoMutation from '../mutations/RenameTodoMutation';
 import TodoTextInput from './TodoTextInput';
@@ -31,6 +32,16 @@ class Todo extends React.Component {
     ChangeTodoStatusMutation.commit(
       this.props.relay.environment,
       complete,
+      this.props.todo,
+      this.props.viewer,
+    );
+  };
+
+  _handleImportantChange = (e) => {
+    const important = e.target.checked;
+    ChangeTodoImportantMutation.commit(
+      this.props.relay.environment,
+      important,
       this.props.todo,
       this.props.viewer,
     );
@@ -84,12 +95,20 @@ class Todo extends React.Component {
         className={classnames({
           completed: this.props.todo.complete,
           editing: this.state.isEditing,
+          important: this.props.todo.important,
         })}>
         <div className="view">
           <input
             checked={this.props.todo.complete}
             className="toggle"
             onChange={this._handleCompleteChange}
+            type="checkbox"
+          />
+          <input
+            label="important"
+            checked={this.props.todo.important}
+            className="toggle important"
+            onChange={this._handleImportantChange}
             type="checkbox"
           />
           <label onDoubleClick={this._handleLabelDoubleClick}>
@@ -110,6 +129,7 @@ export default createFragmentContainer(Todo, {
   todo: graphql`
     fragment Todo_todo on Todo {
       complete,
+      important,
       id,
       text,
     }

@@ -9,6 +9,18 @@ type AddTodoPayload {
   clientMutationId: String
 }
 
+input ChangeTodoImportantInput {
+  important: Boolean!
+  id: ID!
+  clientMutationId: String
+}
+
+type ChangeTodoImportantPayload {
+  todo: Todo
+  viewer: User
+  clientMutationId: String
+}
+
 input ChangeTodoStatusInput {
   complete: Boolean!
   id: ID!
@@ -35,6 +47,7 @@ type MarkAllTodosPayload {
 type Mutation {
   addTodo(input: AddTodoInput!): AddTodoPayload
   changeTodoStatus(input: ChangeTodoStatusInput!): ChangeTodoStatusPayload
+  changeTodoImportant(input: ChangeTodoImportantInput!): ChangeTodoImportantPayload
   markAllTodos(input: MarkAllTodosInput!): MarkAllTodosPayload
   removeCompletedTodos(input: RemoveCompletedTodosInput!): RemoveCompletedTodosPayload
   removeTodo(input: RemoveTodoInput!): RemoveTodoPayload
@@ -109,6 +122,7 @@ type Todo implements Node {
   id: ID!
   text: String
   complete: Boolean
+  important: Boolean
 }
 
 # A connection to a list of items.

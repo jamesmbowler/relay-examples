@@ -24,6 +24,7 @@ const mutation = graphql`
         cursor
         node {
           complete
+          important
           id
           text
         }

@@ -182,6 +182,9 @@ label[for='toggle-all'] {
 	-webkit-appearance: none;
 	appearance: none;
 }
+.todo-list li .important {
+	left: 40px;
+}
 
 .todo-list li .toggle:after {
 	content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
@@ -194,7 +197,7 @@ label[for='toggle-all'] {
 .todo-list li label {
 	word-break: break-all;
 	padding: 15px 60px 15px 15px;
-	margin-left: 45px;
+	margin-left: 85px;
 	display: block;
 	line-height: 1.2;
 	transition: color 0.4s;
@@ -203,6 +206,10 @@ label[for='toggle-all'] {
 .todo-list li.completed label {
 	color: #d9d9d9;
 	text-decoration: line-through;
+}
+
+.todo-list li.important label {
+	color: green;
 }
 
 .todo-list li .destroy {

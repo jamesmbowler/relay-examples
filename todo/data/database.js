@@ -29,12 +29,26 @@ const todoIdsByUser = {
   [VIEWER_ID]: [],
 };
 let nextTodoId = 0;
-addTodo('Taste JavaScript', true);
-addTodo('Buy a unicorn', false);
+addTodo('First');
+addTodo('Taste JavaScript');
+addTodo('Buy a unicorn');
+addTodo('3Taste JavaScript');
+addTodo('4Buy a unicorn');
+addTodo('5Taste JavaScript');
+addTodo('6Buy a unicorn');
+addTodo('7Taste JavaScript');
+addTodo('8Buy a unicorn');
+addTodo('9Taste JavaScript');
+addTodo('10Buy a unicorn');
+addTodo('11Taste JavaScript');
+addTodo('11Taste JavaScript');
+addTodo('11Taste JavaScript');
+addTodo('Buy a unicorn');
 
-export function addTodo(text, complete) {
+export function addTodo(text) {
   const todo = new Todo();
-  todo.complete = !!complete;
+  todo.complete = 0;
+  todo.important = 0;
   todo.id = `${nextTodoId++}`;
   todo.text = text;
   todosById[todo.id] = todo;
@@ -47,6 +61,11 @@ export function changeTodoStatus(id, complete) {
   todo.complete = complete;
 }
 
+export function changeTodoImportant(id, important) {
+  const todo = getTodo(id);
+  todo.important = important;
+}
+
 export function getTodo(id) {
   return todosById[id];
 }
@@ -57,6 +76,12 @@ export function getTodos(status = 'any') {
     return todos;
   }
   return todos.filter(todo => todo.complete === (status === 'completed'));
+}
+
+export function getImportantTodos() {
+  const todos = todoIdsByUser[VIEWER_ID].map(id => todosById[id]);
+
+  return todos.filter(todo => todo.complete === (important === 1));
 }
 
 export function getUser(id) {
